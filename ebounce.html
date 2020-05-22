@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+         
+          margin: auto;
+          border:2px solid black;background-color: black;position: relative;text-align: center;
+          left:25% ;
+}
+</style>
+
+</head>
+<body onload="startGame()">
+    
+<script>
+
+var myGamePiece;
+var currentColorDown;
+var currentColorleft;
+var currentColorRight;
+var currentColorUp;
+var clink=new Audio()
+clink.src="clink.wav";
+var candy=new Audio()
+candy.src="candy.mp3"; 
+
+function startGame() {
+       myGamePiece = new ball(15, "red",300,500,"",550);
+    myScore = new ball( "30px","White", 240, 40, "text", "Consolas",);
+    /*myob1=new obstacle(100,100,50);*/
+    runObs=new runObstacle();
+   /* mycolorBall=new obstacle(300,100,15);*/
+    myGameArea.start();
+}
+function updateGameArea() {
+    
+     myGameArea.clear();
+  runObs.obstacleRun();
+    myGamePiece.newPos();
+    if (myGameArea.keys && myGameArea.keys[38] && myGamePiece.y>15 ) {myGamePiece.speedY=0.8; myGamePiece.font-=3;candy.play();}
+  if (myGameArea.keys && myGameArea.keys[40] && myGamePiece.y<725) {myGamePiece.speedY=-0.1; myGamePiece.font+=3;candy.play();}
+ myGamePiece.update();
+   myScore.text="SCORE: " + myGameArea.frameNo/100;
+   myScore.update();
+     
+    
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width =600;
+        this.canvas.height = window.innerHeight;
+        this.frameNo=0;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 20);
+        window.addEventListener('keydown', function (e) {
+            myGameArea.keys = (myGameArea.keys || []);
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+        })
+        window.addEventListener('keyup', function (e) {
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");            
+        })
+             
+    },
+    stop : function() {
+        clearInterval(this.interval);
+    },    
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+function obstacle(x,y,r,strangle,endangle,col){
+    this.x=x;
+    this.y=y;
+    this.r=r;
+    this.strangle=strangle;
+    this.endangle=endangle;
+    this.col=col;
+    this.angle=0;
+    this.color=["red","lightblue","yellow","lime"];
+    this.circleRight=function(){ 
+     ctx = myGameArea.context;
+   
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.angle);
+   ctx.translate(-this.x,-this.y);
+    
+    ctx.fillStyle = this.col;
+   // ctx.lineWidth=15;     
+    ctx.beginPath();
+    ctx.moveTo(this.x,this.y);
+    ctx.arc(this.x,this.y,this.r,this.strangle,this.endangle,false);
+    ctx.lineTo(this.x,this.y);
+    ctx.closePath();
+    ctx.fill(); 
+   //console.log(ctx.isPointInPath( this.x- this.r,this.y));
+ if (ctx.isPointInPath( this.x- this.r, this.y)&& myGamePiece.y-myGamePiece.radius<=this.y+(this.r/Math.sqrt(2)) && myGamePiece.y+myGamePiece.radius>=this.y-(this.r/Math.sqrt(2))) {
+        currentColorRight= this.col;
+        console.log(currentColorRight); 
+ };
+  
+    ctx.fillStyle = "black"; 
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r-15,0,2*Math.PI,false);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    
+    };
+    this.circleleft=function(){ 
+     ctx = myGameArea.context;
+   
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.angle);
+   ctx.translate(-this.x,-this.y);
+    
+    ctx.fillStyle = this.col;
+   // ctx.lineWidth=15;     
+    ctx.beginPath();
+    ctx.moveTo(this.x,this.y);
+    ctx.arc(this.x,this.y,this.r,this.strangle,this.endangle,false);
+    ctx.lineTo(this.x,this.y);
+    ctx.closePath();
+    ctx.fill(); 
+//console.log(ctx.isPointInPath( this.x+ this.r,this.y));
+ if (ctx.isPointInPath( this.x+this.r,this.y) && myGamePiece.y-myGamePiece.radius<=this.y+(this.r/Math.sqrt(2)) && myGamePiece.y>=this.y-(this.r/Math.sqrt(2)) ) {
+        currentColorleft= this.col;
+      console.log(currentColorleft); 
+ };
+
+  
+    ctx.fillStyle = "black"; 
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r-15,0,2*Math.PI,false);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    
+    };
+    this.circle=function(){ 
+     ctx = myGameArea.context;
+   
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.angle);
+   ctx.translate(-this.x,-this.y);
+    
+    ctx.fillStyle = this.col;
+   // ctx.lineWidth=15;     
+    ctx.beginPath();
+    ctx.moveTo(this.x,this.y);
+    ctx.arc(this.x,this.y,this.r,this.strangle,this.endangle,false);
+    ctx.lineTo(this.x,this.y);
+    ctx.closePath();
+    ctx.fill(); 
+    if (ctx.isPointInPath( this.x, this.y- this.r) &&  myGamePiece.y+myGamePiece.radius>=this.y-this.r-15 && myGamePiece.y-myGamePiece.radius<=this.y-this.r+30) {
+        currentColorUp= this.col;
+      // console.log(currentColorUp); 
+ };
+ console.log(ctx.isPointInPath( this.x, this.y- this.r+1));
+
+ if (ctx.isPointInPath( this.x, this.y+ this.r) && myGamePiece.y-myGamePiece.radius<=this.y+this.r+15 && myGamePiece.y+myGamePiece.radius>=this.y+this.r-30) {
+        currentColorDown= this.col;
+      // console.log(currentColorDown); 
+ };
+    ctx.fillStyle = "black"; 
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r-15,0,2*Math.PI,false);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    
+    };
+    this.colorBall=function(){
+        ctx = myGameArea.context;
+        ctx.save(); 
+        ctx.translate(this.x,this.y);
+    ctx.rotate(this.angle);
+   ctx.translate(-this.x,-this.y);      
+                        
+           for(i=0;i<4;i++){
+            
+             
+             ctx.beginPath();
+             ctx.fillStyle=this.color[i];
+             ctx.moveTo(this.x,this.y);
+              ctx.arc(this.x,this.y,this.r,(i)*Math.PI/2,(i+1)*Math.PI/2,false);
+               ctx.lineTo(this.x,this.y);
+             ctx.closePath();
+           ctx.fill();
+   
+         ctx.closePath(); 
+        
+         
+                      }
+                      ctx.restore();
+         }
+        
+    
+    
+}
+
+function ball(radius, color, x, y,type,font) {
+    this.font=font;
+    this.type=type;
+   this.radius=radius;
+    this.x = x;
+    this.y = y;    
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.gravity = 0.1;
+    this.gravitySpeed = 0;
+    this.bounce = 2;
+    this.rockbottom=0;
+    this.color=color;
+    
+    this.update = function() { 
+           
+        ctx = myGameArea.context;
+        if (this.type == "text") {
+    ctx.font = this.radius+ " " +this.font ;
+    ctx.fillStyle = this.color;
+    ctx.fillText(this.text, this.x+150, this.y);
+} else{
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(this.x, this.y,this.radius,0,2*Math.PI);
+        ctx.fill();
+        ctx.closePath();
+}
+
+    }
+    this.newPos = function() {
+       
+        this.gravitySpeed += this.gravity;
+        this.x += this.speedX;
+
+        this.y += this.speedY + this.gravitySpeed;
+        this.hitBottom();
+       
+    }
+    this.hitBottom = function() {
+        
+        this.rockbottom =this.font;
+          if (this.y >this.rockbottom) {
+            this.y = this.rockbottom;
+            this.gravitySpeed = -(this.bounce);
+        }
+    }
+    this.obstacleCrashCentre=function(otherobj){
+        ctx = myGameArea.context;
+          var mycolor=myGamePiece.color;
+             
+           
+                 var crash=false;
+               
+                 if(mycolor!=currentColorDown && this.y-this.radius<=otherobj.y+otherobj.r && this.y+this.radius>=otherobj.y+otherobj.r-15){
+             crash=true;
+             console.log(mycolor,currentColorDown);
+
+                 }
+                 if(mycolor!=currentColorUp && this.y+this.radius>=otherobj.y-otherobj.r && this.y-this.radius<=otherobj.y-otherobj.r+15){
+                    console.log(mycolor,currentColorUp);
+
+        crash=true;
+            } 
+      return crash;
+    }
+    this.obstacleCrashleft=function(otherobj){
+        ctx = myGameArea.context;
+          var mycolor=myGamePiece.color;
+             
+           
+                 var crash=false;
+               
+                 if(mycolor!=currentColorleft &&  this.y-this.radius<=otherobj.y+20 &&this.y+this.radius>=otherobj.y-20 ){
+                    console.log(currentColorleft,mycolor);
+             crash=true;
+                 }
+                 
+      return crash;
+    }
+    this.obstacleCrashRight=function(otherobj){
+        ctx = myGameArea.context;
+          var mycolor=myGamePiece.color;
+             
+           
+                 var crash=false;
+                 if(mycolor!=currentColorRight &&  this.y-this.radius<=otherobj.y+20 &&this.y+this.radius>=otherobj.y-20){
+                     console.log(currentColorRight,mycolor);
+             crash=true;
+                 }
+                 
+      return crash;
+    }
+}
+function runObstacle(){
+    this.myObstaclesCircleCentre= [];
+    this.myObstaclesCircleRight= [];
+    this.myObstaclesCircleleft = [];
+  this.myObstaclesColor=[];
+    this. minradius = 80;
+    this.maxradius = 100;
+    this.centre=300;
+  
+    
+    this.obstacleRun=function(){
+    myGameArea.frameNo +=1;
+    
+        if (myGameArea.frameNo == 1 || everyinterval(300)) {
+        this.h = myGameArea.canvas.height;
+        this.k=Math.floor(Math.random()*4);
+        this.radius1 = Math.floor(Math.random()*(this.maxradius-this.minradius+1)+this.minradius);
+       this.radius2 = Math.floor(Math.random()*(this.maxradius-this.minradius+1)+this.minradius);
+           
+       
+       if(this.k==2){
+       this.myObstaclesCircleCentre.push(new obstacle(this.centre,600-this.h,this.radius1,0,Math.PI/2,"red"));
+       this.myObstaclesCircleCentre.push(new obstacle(this.centre,600-this.h,this.radius1,Math.PI/2,Math.PI,"lightblue"));
+       this.myObstaclesCircleCentre.push(new obstacle(this.centre,600-this.h,this.radius1,Math.PI,(3/2)*Math.PI,"yellow"));
+       this.myObstaclesCircleCentre.push(new obstacle(this.centre,600-this.h,this.radius1,(3/2)*Math.PI,2*Math.PI,"lime"));
+
+       }
+        if(this.k==1){
+            this.myObstaclesCircleRight.push(new obstacle(this.centre+this.radius1,600-this.h,this.radius1,0,Math.PI/2,"red"));
+       this.myObstaclesCircleRight.push(new obstacle(this.centre+this.radius1,600-this.h,this.radius1,Math.PI/2,Math.PI,"lightblue"));
+       this.myObstaclesCircleRight.push(new obstacle(this.centre+this.radius1,600-this.h,this.radius1,Math.PI,(3/2)*Math.PI,"yellow"));
+       this.myObstaclesCircleRight.push(new obstacle(this.centre+this.radius1,600-this.h,this.radius1,(3/2)*Math.PI,2*Math.PI,"lime"));
+       }
+        if(this.k==0){
+      this.myObstaclesColor.push(new obstacle(this.centre,600-this.h,15));
+       }
+       if(this.k==3){
+        this.myObstaclesCircleleft.push(new obstacle(this.centre-this.radius1,600-this.h,this.radius1,0,Math.PI/2,"red"));
+       this.myObstaclesCircleleft.push(new obstacle(this.centre-this.radius1,600-this.h,this.radius1,Math.PI/2,Math.PI,"lightblue"));
+       this.myObstaclesCircleleft.push(new obstacle(this.centre-this.radius1,600-this.h,this.radius1,Math.PI,(3/2)*Math.PI,"yellow"));
+       this.myObstaclesCircleleft.push(new obstacle(this.centre-this.radius1,600-this.h,this.radius1,(3/2)*Math.PI,2*Math.PI,"lime"));
+              }
+        }
+
+       
+     
+    
+    if(this.k==2 || this.myObstaclesCircleCentre.length >0){ 
+         
+    for ( var i = 0; i < this.myObstaclesCircleCentre.length; i++) {
+        if (myGamePiece.obstacleCrashCentre(this.myObstaclesCircleCentre[i])) {
+            clink.play();
+         myGameArea.stop();
+         myGameArea.stop();
+            h= myGameArea.frameNo/100;
+            text="Your Score is:"+h;
+            myGameArea.clear();
+            ctx.font = "60px Arial ";
+            ctx.fillStyle = myGamePiece.color;
+            ctx.fillText(text, 50, 200);
+            local(h);
+            stp();
+           return;
+        }else{
+       
+       this.myObstaclesCircleCentre[i].y+=1;
+       this.myObstaclesCircleCentre[i].angle+=Math.PI / 180;
+       this.myObstaclesCircleCentre[i].circle();
+                   
+        }
+       }
+       
+    }
+     if(this.k==1 || this.myObstaclesCircleRight.length >0){   
+        for ( var i = 0; i < this.myObstaclesCircleRight.length; i++) {
+        if (myGamePiece.obstacleCrashRight(this.myObstaclesCircleRight[i])) {
+            clink.play();
+             myGameArea.stop();
+            h= myGameArea.frameNo/100;
+            text="Your Score is:"+h;
+            myGameArea.clear();
+            ctx.font = "60px Arial ";
+            ctx.fillStyle =  myGamePiece.color;
+            ctx.fillText(text, 50, 200);
+            local(h);
+            stp();
+            return;
+        }else{
+       
+       this.myObstaclesCircleRight[i].y+=1;
+       this.myObstaclesCircleRight[i].angle+=Math.PI / 180;
+       this.myObstaclesCircleRight[i].circleRight();
+                   
+        }
+       }
+    }
+    if(this.k==3 || this.myObstaclesCircleleft.length >0){   
+        for ( var i = 0; i < this.myObstaclesCircleleft.length; i++) {
+        if (myGamePiece.obstacleCrashleft(this.myObstaclesCircleleft[i])) {
+            clink.play();
+         myGameArea.stop();
+         myGameArea.stop();
+            h= myGameArea.frameNo/100;
+            text="Your Score is:"+h;
+            myGameArea.clear();
+            ctx.font = "60px Arial ";
+            ctx.fillStyle = myGamePiece.color;
+            ctx.fillText(text, 50, 200);
+            local(h);
+            stp();
+           return;
+        }else{
+       
+       this.myObstaclesCircleleft[i].y+=1;
+       this.myObstaclesCircleleft[i].angle+=Math.PI / 180;
+       this.myObstaclesCircleleft[i].circleleft();
+                   
+        }
+       }
+    }
+     if(this.k==0 || this.myObstaclesColor.length >0){
+
+for ( var i = 0; i < this.myObstaclesColor.length ; i++) {
+    if(this.myObstaclesColor[i].y!=myGamePiece.font-19){
+          
+          this.myObstaclesColor[i].y+=1;
+         this.myObstaclesColor[i].angle+=Math.PI / 180;
+         this.myObstaclesColor[i].colorBall();
+             }else{
+                clink.play();
+          this.colo=["red","lightblue","yellow","lime"];
+         this.p=Math.floor(Math.random()*4)
+          myGamePiece = new ball(15, this.colo[this.p],myGamePiece.x,myGamePiece.y,"",myGamePiece.font);
+          myGamePiece.newPos();
+          myGamePiece.update();
+          this.myObstaclesColor[i].y+=this.h;
+             }       
+    }
+    }
+         function everyinterval(n) {
+
+    if ((myGameArea.frameNo / n) % 1 ==0) {return true;}
+    return false;
+}
+    }
+  
+    
+    }
+    function stp(){
+     window.setTimeout(cance,4000);
+ };
+ function cance(){
+    window.document.location="game.html";
+ };
+ function local(l)
+    {
+        var a = [];
+        a = JSON.parse(localStorage.getItem('Edistance')) || [];
+        a.push(l);
+        localStorage.setItem('Edistance', JSON.stringify(a));
+        
+    }
+        
+    
+
+</script>
+
+</body>
+</html>

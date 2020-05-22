@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Bounce</title>
+<style>
+    body{
+        background:black;
+        background-size: 100% ;
+        text-align: center;
+        
+       
+        }
+    button,#mode1,#scr,#scre,#scro {
+  background-color:blueviolet;
+  border: snow solid 1%;
+  color:black;
+  padding: 1% 2%;
+  text-align: center;
+  font-size: 100%;
+  cursor: pointer;
+  border-radius: 5px;
+}  
+.ds{
+  color:whitesmoke;
+        font: 1em sans-serif bolder;
+        text-align: center;
+}  
+    
+</style>
+
+</head>
+<body>
+    
+    <br><br> <br><br> <br><br> <br><br> <br><br> <br><br>
+   
+    <button type="submit" id='sub' onmousedown="bleep.play()">Start game &#128077</button>
+    <br><br>
+    <select name="mode1" id="mode1" onchange=" bleep.play()" >
+        <option id="easy" value="easy" >Easy</option>
+        <option id="har" value="har" >Hard</option>
+    </select>
+
+    <br><br>
+    
+        <!--button>BestScore</button><br><br-->
+  <button id="scr" onmousedown="bleep.play()" onclick="scro()" > E-BScore</button>
+  <button id="scro" onmousedown="bleep.play()" onclick="scre()">H-BScore</button>
+  <h3 class='ds' id='one'></h3>
+  <h3 class='ds' id='two'></h3>
+  <h3  class='ds'id='three'></h3>
+  <h3 class='ds' id='four'></h3>
+  <h3 class='ds' id='five'></h3>
+    
+    
+    <form action="exit.html"-->
+   <button onmousedown="bleep.play()"> Exit &#128400</button>
+    </form-->
+
+    <script >
+              
+         var bleep=new Audio()
+bleep.src="bleep.mp3"; 
+     const map = {
+    easy: 'ebounce.html'
+ ,har: 'mbounce.html'
+ 
+}
+document.getElementById('sub').addEventListener('click', () =>
+  location.href = map[document.getElementById('mode1').value])
+  function scro(){
+  a = JSON.parse(localStorage.getItem('Edistance')) || [];
+  console.log(a[0]);
+  a.sort(function(a, b){return b-a});
+  document.getElementById("one").innerHTML="&#128526 "+a[0]+" distance";
+  document.getElementById("two").innerHTML="&#128526 "+a[1]+" distance";
+  document.getElementById("three").innerHTML="&#128526 "+a[2]+" distance";
+  document.getElementById("four").innerHTML="&#128526 "+a[3]+" distance";
+  document.getElementById("five").innerHTML="&#128526 "+a[4]+" distance";
+ 
+  }
+  function scre(){
+    a = JSON.parse(localStorage.getItem('Mdistance')) || [];
+  console.log(a[0]);
+  a.sort(function(a, b){return b-a});
+  document.getElementById("one").innerHTML="&#128526 "+a[0]+" distance";
+  document.getElementById("two").innerHTML="&#128526 "+a[1]+" distance";
+  document.getElementById("three").innerHTML="&#128526 "+a[2]+" distance";
+  document.getElementById("four").innerHTML="&#128526 "+a[3]+" distance";
+  document.getElementById("five").innerHTML="&#128526 "+a[4]+" distance";
+ 
+  }
+  
+</script>    
+    
+   
+
+</body>
+</html>
